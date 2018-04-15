@@ -15,7 +15,7 @@
         </Sider>
         <Layout>
              <Header :style="{padding: 0,background:'none',height:'50px',lineHeight:'50px',verticalAlign:'middle'}"  class="layout-header-bar">
-                    <span @click="collapsedSider" :style="{margin:'10px 10px'}">首页</span>
+                    <span @click="collapsedSider" :style="{margin:'10px 10px'}">{{title}}</span>
             </Header>
             <Content :style="{padding:'10px'}" >
             
@@ -34,6 +34,7 @@
             return {
                 theme3:'light',
                 isCollapsed: false,
+                title:'首页',
                 appList:[
 
                 ]
@@ -42,9 +43,10 @@
         created(){
             this.appList = [
                 {appid:'1',icon:'home',name:'首页',path:'/'},
-                {appid:'2',icon:'android-compass',name:'翻译',path:'/ts'},
+                {appid:'2',icon:'social-pinterest',name:'翻译',path:'/ts'},
                 {appid:'3',icon:'ios-chatbubble',name:'消息',path:'/msg'},
                 {appid:"4",icon:'ios-list',name:'任务清单',path:'/task'},
+                {appid:'6',icon:'android-compass',name:'浏览',path:'/brow'},
                 {appid:'5',icon:'person',name:'个人中心',path:'/person'}
             ];
         },
@@ -76,7 +78,7 @@
                         App = v;
                     }
                 });
-
+                this.title = App.name;
                 if(App)
                 this.$router.push({ path: App.path });
 
