@@ -46,7 +46,7 @@
                 {appid:'2',icon:'social-pinterest',name:'翻译',path:'/ts'},
                 {appid:'3',icon:'ios-chatbubble',name:'消息',path:'/msg'},
                 {appid:"4",icon:'ios-list',name:'任务清单',path:'/task'},
-                {appid:'6',icon:'android-compass',name:'浏览',path:'/brow'},
+                {appid:'7',icon:'help-buoy',name:'应用箱',path:'/app'},
                 {appid:'5',icon:'person',name:'个人中心',path:'/person'}
             ];
         },

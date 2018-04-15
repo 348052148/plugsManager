@@ -40,6 +40,13 @@ const routers = [
             title: ''
         },
         component: (resolve) => require(['./views/login.vue'], resolve)
+    },
+    {
+        path: '/brow',
+        meta: {
+            title: ''
+        },
+        component: (resolve) => require(['./views/brow.vue'], resolve)
     }
 
 ];

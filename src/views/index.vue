@@ -2,6 +2,9 @@
     *{
         list-style:none;
     }
+    a{
+        color:#000;
+    }
     .index{
         width: 100%;
         flex-direction: row;
@@ -71,7 +74,9 @@
         </Carousel>
         <div class="plugs">
             <ul>
+                <router-link to="/brow">
                 <li><Icon size="40" class="icon" type="aperture"></Icon><span>图形</span></li>
+                </router-link>
                 <li><Icon size="40" class="icon" type="coffee"></Icon></Icon><span>coffie</span></li>
                 <li><Icon size="40" class="icon" type="contrast"></Icon></Icon><span>半球</span></li>
                 <li><Icon size="40" class="icon" type="ipod"></Icon></Icon><span>触摸</span></li>
