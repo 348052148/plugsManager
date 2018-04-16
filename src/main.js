@@ -5,7 +5,9 @@ import Routers from './router';
 import Util from './libs/util';
 import App from './app.vue';
 import 'iview/dist/styles/iview.css';
+
 import user from './libs/user';
+import socket from './libs/socket';
 
 Vue.use(VueRouter);
 Vue.use(iView);
@@ -17,19 +19,19 @@ const RouterConfig = {
 const router = new VueRouter(RouterConfig);
 
 //开启socket 连接
-Util.listenConnect((ws)=>{
+socket.listenConnect((ws)=>{
 
     if(!user.isLogin()){
         //自动登录逻辑
         let isAuto = user.autoLogin((userInfo)=>{
 
-            Util.request('login',{username:userInfo.username,pass:userInfo.passwd},(msg)=>{
+            socket.request('login',{username:userInfo.username,pass:userInfo.passwd,id:userInfo.id},(msg)=>{
                 console.log(msg);
                 user.friendLst = msg.data.friendLst;
                 user.id = msg.data.id;
                 user.nickname = msg.data.nickname;
                 user.accessToken = msg.data.accessToken;
-                user.login(userInfo.username,userInfo.passwd);
+                user.login(userInfo.username,userInfo.passwd,user.id);
 
                 iView.Message.success('自动登录成功！');
             });
@@ -41,7 +43,7 @@ Util.listenConnect((ws)=>{
     }
 
     //监听好友列表
-    Util.listen('user.friend.list',(msg)=>{
+    socket.listen('user.friend.list',(msg)=>{
         console.log(msg);
         let uLst = [];
         msg.data.list.forEach((v)=>{
@@ -53,7 +55,7 @@ Util.listenConnect((ws)=>{
     });
 });
 try{
-    Util.socketServer((e)=>{
+    socket.socketServer((e)=>{
 
     },(err)=>{
         iView.Message.error('无法连接到服务器');

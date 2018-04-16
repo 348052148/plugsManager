@@ -140,14 +140,45 @@
          margin-top:10px;
          margin-right:10px;
     }
+
+    /**搜索 */
+    .optionSearch{
+        width:100%;
+        display:inline-block;
+    }
+    .optionSearch .complete-title{
+        display:inline-block;
+    }
+    .optionSearch .complete-add {
+        display:inline-block;
+        float:right;
+    }
+    .biao{
+        font-size:10px;
+        text-align:center;
+    }
 </style>
 <template>
     <div class="message">
         <div class="msg-list-swrip">
         <div class="msg-list">
             <ul>
-                <li class="search"><i-input icon="search" placeholder="搜索" ></i-input></li>
-                <li v-for="user in userLst"  :style="currentUserStyle(user.id)" @click="selectUser(user)"  >
+                <li class="search">
+                <AutoComplete
+                    icon="search"
+                    v-model="search"
+                    @on-search="handleSearch"
+                    @on-select="selectFriend"
+                    placeholder="搜索">
+                        <Option class="optionSearch" v-for="friend in searchLst" :value="friend.nickname" :key="friend.id">
+                            <span class="complete-title">{{ friend.nickname }}</span>
+                            <span @click="addFriend" class="complete-add"><Icon type="plus-round"></Icon></span>
+                        </Option>
+
+                    <a target="_blank" class="biao">好友搜索</a>
+
+                </AutoComplete></li>
+                <li v-for="user in userInfo.friendLst" v-if="user.id!=userInfo.id"  :style="currentUserStyle(user.id)" @click="selectUser(user)"  >
                     <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" />
                     &nbsp;&nbsp;{{user.nickname}}
                     <Badge class="demo-badge-alone" :count="unreadMsgCount(user)">
@@ -157,7 +188,7 @@
         </div>
         </div>
 
-        <div class="msg-window">
+        <div class="msg-window" v-if="isActive==true">
         <Scroll :style="{background:'#fff',marginBottom:'10px'}" :height="400" class="chat" >
             <ul>
                 <li v-for="msg in getUserMsg" :class="msg.ismster?'slef-mode':'msg-mode'">
@@ -175,18 +206,27 @@
         <i-button type="primary" shape="circle">发送</i-button>
         </div>
 
+        <div v-else  class="msg-window">
+
+        </div>
+
     </div>
 </template>
 <script>
     import util from '../libs/util.js';
     import user from '../libs/user.js';
+    import socket from '../libs/socket.js';
     export default {
         data(){
             return {
+                search:'',
+                searchLst:[],
+
                 ws:{},
                 userInfo:{},
                 userLst:[],
                 currentId:0,
+                isActive:false,
                 currentIndex:0,
                 inputMsg:''
             }
@@ -195,7 +235,7 @@
             //页面关闭时释放消息连接
             window.onbeforeunload = ()=> {
 
-                  util.request('user.logout',{
+                  socket.request('user.logout',{
                       uid:this.userInfo.id
                   },(msg)=>{
                     
@@ -204,33 +244,24 @@
            
             // 好友信息处理 包括聊天记录
             this.userInfo = user;
-
-            let uLst = [];
-            if(user.friendLst.length >1){
-                user.friendLst.forEach((v)=>{
-                    //排除自己
-                    if(v.id!=user.id){
-                        uLst.push({
-                            id:v.id,nickname:v.nickname,msgLst:[]
-                        });
-                    }
-                });
-                this.userLst = uLst;
-                this.currentId = this.userLst[0].id;
+            if(user.friendLst > 1) {
+                this.currentId = user.friendLst[0].id;
+                this.isActive = true;
             }
+            
 
             //监听消息
-            util.listen('message.recv',(msg)=>{
+            socket.listen('message.recv',(msg)=>{
                  console.log(msg);
                     let index = null;
-                    this.userLst.forEach((v,i)=>{
+                    this.userInfo.friendLst.forEach((v,i)=>{
                         if(v.id == msg.data.from){
                             index = i;
                         }
                     });
                     if(index!=null)
-                    this.userLst[index].msgLst.push({
-                        ismster:false,user:this.userLst[index],
+                    this.userInfo.friendLst[index].msgLst.push({
+                        ismster:false,user:this.userInfo.friendLst[index],
                         content:{
                             text:msg.data.content
                         }
@@ -242,20 +273,40 @@
         computed: {
             getUserMsg(){
                 let i =0;
-                this.userLst.forEach((v,index)=>{
+                this.userInfo.friendLst.forEach((v,index)=>{
                     
                     if(v.id == this.currentId){
                         i = index;
                         this.currentIndex = index;
                     }
                 });
-                if(!this.userLst[i]){
+                if(!this.userInfo.friendLst[i]){
                     return [];
                 }
-                return this.userLst[i].msgLst;
+                return this.userInfo.friendLst[i].msgLst;
             }
         },
         methods: {
+            //选择好友
+            selectFriend(){
+
+            },
+            //添加好友
+            addFriend(){
+
+            },
+            //处理搜索
+            handleSearch(value){
+                socket.request('user.find.list',{keyword:value},(data)=>{
+                    console.log(data);
+                    this.searchLst = data.data.list;
+                    // this.searchLst = [];
+                    // data.data.list.forEach((v)=>{
+                    //     this.searchLst.push(v.nickname);
+                    // });
+                });
+                
+            },
 
             //获取未读消息
             unreadMsgCount(user){
@@ -281,15 +332,20 @@
             //发送消息
             inputMessage () {
 
-                util.request('message.send',{
+                if(this.inputMsg == '') {
+                    this.$Message.warning('不能发送空消息');
+                    return false;
+                }
+
+                socket.request('message.send',{
                     from:this.userInfo.id,
-                    to:this.userLst[this.currentIndex].id,
+                    to:this.userInfo.friendLst[this.currentIndex].id,
                     content:this.inputMsg
                 },(msg)=>{
                    
                 });
 
-                this.userLst[this.currentIndex].msgLst.push(
+                this.userInfo.friendLst[this.currentIndex].msgLst.push(
                     {
                         ismster:true,user:this.userInfo,
                         content:{
@@ -302,6 +358,7 @@
             //选择用户
             selectUser(user){
                 this.currentId = user.id;
+                this.isActive = true;
                 console.log(this.currentId);
             }
         }

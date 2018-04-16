@@ -40,6 +40,7 @@
 <script>
     import util from '../libs/util.js';
     import user from '../libs/user.js';
+    import socket from '../libs/socket.js';
     export default {
         data(){
             return {
@@ -48,15 +49,20 @@
         },
         methods: {
             handleSubmit(){
+                let id = util.MD5(this.loginForm.username+this.loginForm.passwd);
                 //登录
-                util.request('login',{username:this.loginForm.username,pass:this.loginForm.passwd},(msg)=>{
+                socket.request('login',{
+                    username:this.loginForm.username,
+                    pass:this.loginForm.passwd,
+                    id:id
+                },(msg)=>{
                     console.log(msg);
                     user.friendLst = msg.data.friendLst;
                     user.id = msg.data.id;
                     user.nickname = msg.data.nickname;
                     user.accessToken = msg.data.accessToken;
 
-                    user.login(this.loginForm.username,this.loginForm.passwd);
+                    user.login(this.loginForm.username,this.loginForm.passwd,user.id);
 
                     this.$router.go(-1);
                     this.$Message.success('登录成功');

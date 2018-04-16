@@ -21,8 +21,9 @@ user.setLogin = function(s){
     this._isLogin = s;
 }
 //登录
-user.login = function(username,passwd){
-    localStorage.setItem('user',JSON.stringify({username:username,passwd:passwd}));
+user.login = function(username,passwd,id){
+    localStorage.setItem('user',JSON.stringify({username:username,passwd:passwd,id:id}));
+    localStorage.setItem('user.friendLst',JSON.stringify(this.friendLst));
     this.setLogin(true);
 }
 //退出登录
@@ -38,6 +39,7 @@ user.autoLogin = function(callback){
 
         if(!user.username) return false;
         if(!user.passwd) return false;
+        if(!user.id) return false;
 
         if(user){
             callback(user);
