@@ -42,11 +42,20 @@ const routers = [
         component: (resolve) => require(['./views/login.vue'], resolve)
     },
     {
+        name: 'brow',
         path: '/brow',
         meta: {
             title: ''
         },
         component: (resolve) => require(['./views/brow.vue'], resolve)
+    },
+    {
+        name: 'appbox',
+        path: '/appbox',
+        meta: {
+            title: ''
+        },
+        component: (resolve) => require(['./views/appbox.vue'], resolve)
     }
 
 ];

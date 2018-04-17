@@ -8,15 +8,7 @@ import 'iview/dist/styles/iview.css';
 
 import user from './libs/user';
 import socket from './libs/socket';
-
-Vue.use(VueRouter);
-Vue.use(iView);
-
-// 路由配置
-const RouterConfig = {
-    routes: Routers
-};
-const router = new VueRouter(RouterConfig);
+import G from './libs/globa.js';
 
 //开启socket 连接
 socket.listenConnect((ws)=>{
@@ -41,7 +33,7 @@ socket.listenConnect((ws)=>{
         if(!isAuto) router.push({ path: '/login' });
 
     }
-
+    
     //监听好友列表
     socket.listen('user.friend.list',(msg)=>{
         console.log(msg);
@@ -53,17 +45,37 @@ socket.listenConnect((ws)=>{
             });
         user.friendLst = uLst;
     });
+
+    //监听系统推送通知
+    socket.listen('system.push.notify',(msg)=>{
+        this.$Notice.open({
+            title: '系统通知',
+            desc: '系统可能出现了异常'
+        });
+    });
+
 });
 try{
     socket.socketServer((e)=>{
-
+        G.isnetwork = false;
     },(err)=>{
         iView.Message.error('无法连接到服务器');
+        G.isnetwork = false;
     });
 }catch(e){
     alert('无法连接到服务器');
+    G.isnetwork = false;
 }
 
+
+Vue.use(VueRouter);
+Vue.use(iView);
+
+// 路由配置
+const RouterConfig = {
+    routes: Routers
+};
+const router = new VueRouter(RouterConfig);
 
 router.beforeEach((to, from, next) => {
     iView.LoadingBar.start();

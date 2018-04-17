@@ -74,7 +74,7 @@
         </Carousel>
         <div class="plugs">
             <ul>
-                <router-link to="/brow">
+                <router-link :to="{path:'/brow',params:{func:'TaskList'}}">
                 <li><Icon size="40" class="icon" type="aperture"></Icon><span>图形</span></li>
                 </router-link>
                 <li><Icon size="40" class="icon" type="coffee"></Icon></Icon><span>coffie</span></li>

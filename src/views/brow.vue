@@ -18,26 +18,38 @@
         <!--
        <iframe heiget="500"  src="http://www.baidu.com"  />
        -->
-
+        <LoaderComponents :url="url" />
     </div>
 </template>
 <script>
     import util from '../libs/util.js';
     import user from '../libs/user.js';
     import Loader from '../libs/loader.js';
+    import LoaderComponents from '../libs/LoaderComponents.min.js';
     export default {
+        components:{
+            LoaderComponents 
+        },
+   
         data(){
             return {
-                loginForm:{}
+                url:''
             };
         },
+        watch: {
+            '$route'(to, from) {
+                console.log(this.$route.params.components);
+                this.url = this.$route.params.components;
+            }
+        },
+        beforeUpdate(){
+            
+        },
+        mounted(){
+           
+        },
         created(){
-            let $ = require('jquery');
-            let loader = new Loader();
-            loader.urlLoad('https://api.ismbao.com.cn/dist/index.html#/',(text)=>{
-                console.log(text);
-                $('.brow').html(text);
-            });
+             this.url = this.$route.params.components;
         },
         methods: {
             

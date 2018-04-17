@@ -6,7 +6,7 @@
 
      <Layout class="layer">
         <Sider  ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" >
-            <Menu class="menu" width="200" :theme="theme3" active-name="1" @on-select="select" :class="menuitemClasses">
+            <Menu class="menu" width="200" :theme="theme3" :active-name="active" @on-select="select" :class="menuitemClasses">
                     <MenuItem v-for="app in appList" :name="app.appid">
                         <Icon :type="app.icon"></Icon>
                         <span>{{app.name}}</span>
@@ -16,6 +16,18 @@
         <Layout>
              <Header :style="{padding: 0,background:'none',height:'50px',lineHeight:'50px',verticalAlign:'middle'}"  class="layout-header-bar">
                     <span @click="collapsedSider" :style="{margin:'10px 10px'}">{{title}}</span>
+                    <div class="rnotify">
+                        <ul>
+                            <li>
+                                <Icon :type="isnetwork?'social-rss':'social-rss-outline'" size="16" style="margin-right:5px;"></Icon>
+                            </li>
+                            <li>
+                                 <Badge dot>
+                                    <Icon type="ios-bell-outline" size="20"></Icon>
+                                </Badge>
+                            </li>
+                        </ul>
+                    </div>
             </Header>
             <Content :style="{padding:'10px'}" >
             
@@ -29,26 +41,39 @@
     </div>
 </template>
 <script>
+    import G from './libs/globa.js';
+    import socket from './libs/socket.js';
     export default {
         data () {
             return {
+                active:'1',
                 theme3:'light',
                 isCollapsed: false,
+                isnetwork:true,
                 title:'首页',
                 appList:[
-
+                    {appid:'1',icon:'home',name:'首页',path:'/'}
                 ]
             }
         },
         created(){
-            this.appList = [
-                {appid:'1',icon:'home',name:'首页',path:'/'},
-                {appid:'2',icon:'social-pinterest',name:'翻译',path:'/ts'},
-                {appid:'3',icon:'ios-chatbubble',name:'消息',path:'/msg'},
-                {appid:"4",icon:'ios-list',name:'任务清单',path:'/task'},
-                {appid:'7',icon:'help-buoy',name:'应用箱',path:'/app'},
-                {appid:'5',icon:'person',name:'个人中心',path:'/person'}
-            ];
+            this.isnetwork = G.isnetwork;
+            //首页图标
+            socket.listenConnect((ws)=>{
+                socket.listen('system.app.menu',(res)=>{
+                    console.log(res.data.list);
+                    res.data.list.forEach((v)=>{
+                        this.appList.push(v);
+                        
+                    });
+                });
+
+                socket.request('system.app.menu',{},(res)=>{
+                    //this.appList = res.data.list;
+                });
+            });
+           
+          
         },
         mounted () {
 
@@ -80,7 +105,12 @@
                 });
                 this.title = App.name;
                 if(App)
-                this.$router.push({ path: App.path });
+                if(App.components){
+                    this.$router.push({name:'brow',params:{components:App.components}});
+                }else{
+                     this.$router.push({ path: App.path});
+                }
+               
 
             },
              collapsedSider () {
