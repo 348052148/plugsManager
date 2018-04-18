@@ -1,0 +1,7 @@
+class System{
+
+}
+
+System.run=()=>{
+    
+}

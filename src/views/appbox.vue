@@ -1,7 +1,6 @@
 <style scoped lang="less">
     *{
         margin:0;
-        padding:0;
         list-style:none;
     }
     .appbox{
@@ -58,6 +57,10 @@
         float:right;
         cursor:pointer;
     }
+    .appbox .applist ul li .edit .dic{
+        height:100%;
+        display:inline-block;
+    }
     .appbox .applist ul li .edit .delete{
         height:100%;
         text-align:center;
@@ -96,7 +99,7 @@
     <div class="appbox">
         <div class="state">
             <Input v-model="searchStr" icon="ios-clock-outline" placeholder="搜索" style="width: 300px"></Input>
-             <Button @click="editDis"  type="info">编辑</Button>
+             <Button  @click="editDis"  type="info">编辑</Button>
         </div>
         <div class="applist">
             <ul>
@@ -107,12 +110,12 @@
                         <router-link :to="{name:'brow',params:{components:app.components}}">
                         <Icon size="20" title="打开" class="open" type="outlet"></Icon>
                         </router-link>
-                        <block v-if="edit">
+                        <div class="dic" v-if="edit">
                         <Icon size="20" v-if="app.ismenu == false" title="设置菜单" class="join" type="ios-paperplane"></Icon>
                         <Icon  size="20" v-else title="移除菜单" class="join"  type="android-cancel"></Icon>
                         
                         <Icon size="20" title="移除" class="delete" type="ios-trash-outline"></Icon>
-                        </block>
+                        </div>
                     </div>
                 </li>
 
@@ -122,8 +125,15 @@
     </div>
 </template>
 <script>
-    import socket from '../libs/socket.js';
+    //import socket from '../libs/socket.js';
     export default {
+        props: {
+            // 父组件提供请求地址
+            socket:{
+                type:Object,
+                default:''
+            }
+        },
         data(){
             return {
                 edit:false,
@@ -132,7 +142,8 @@
             };
         },
         created(){
-            socket.request('system.app.list',{},(res)=>{
+            console.log(this.socket);
+            this.socket.request('system.app.list',{},(res)=>{
                 console.log(res.data.list);
                 this.appLst = res.data.list;
             });

@@ -9,9 +9,7 @@ function resolve(dir) {
 
 module.exports = {
   entry: {
-    message: resolve('/src/views/message.vue'),
-    taskList: resolve('/src/views/tasklist.vue'),
-    translate: resolve('/src/views/translate.vue')
+    appbox: resolve('/src/views/appbox.vue')
   },
   output: {
     path: resolve('/static/'),

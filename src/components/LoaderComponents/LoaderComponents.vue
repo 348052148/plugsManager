@@ -9,6 +9,7 @@
     <div class="synComponents">
         <component
             :is="mode"
+            :socket="socket"
             v-bind="$attrs"
             v-on="$listeners">
         </component>
@@ -22,6 +23,10 @@
             url: {
                 type: String,
                 default: ''
+            },
+            socket:{
+                type:Object,
+                default:''
             }
         },
         name:'TaskList',

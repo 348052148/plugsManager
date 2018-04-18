@@ -43,7 +43,7 @@ const routers = [
     },
     {
         name: 'brow',
-        path: '/brow',
+        path: '/brow/:components',
         meta: {
             title: ''
         },

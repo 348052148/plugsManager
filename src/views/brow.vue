@@ -18,14 +18,15 @@
         <!--
        <iframe heiget="500"  src="http://www.baidu.com"  />
        -->
-        <LoaderComponents :url="url" />
+        <LoaderComponents :socket="socket" :url="furl" />
     </div>
 </template>
 <script>
     import util from '../libs/util.js';
     import user from '../libs/user.js';
     import Loader from '../libs/loader.js';
-    import LoaderComponents from '../libs/LoaderComponents.min.js';
+    import LoaderComponents from '../components/LoaderComponents/LoaderComponents.vue';
+    import socket from '../libs/socket.js';
     export default {
         components:{
             LoaderComponents 
@@ -33,7 +34,8 @@
    
         data(){
             return {
-                url:''
+                url:'',
+                socket:null
             };
         },
         watch: {
@@ -42,13 +44,20 @@
                 this.url = this.$route.params.components;
             }
         },
+        computed:{
+            furl(){
+                this.url = this.$route.params.components;
+                return this.url;
+            }
+        },
         beforeUpdate(){
             
         },
         mounted(){
-           
+           console.log('mounted');
         },
         created(){
+            this.socket = socket;
              this.url = this.$route.params.components;
         },
         methods: {
